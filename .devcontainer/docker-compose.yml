@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  adas:
+    volumes:
+      - .:/workspace:cached
+      - adas-home:/home/vscode
+volumes:
+  adas-home:

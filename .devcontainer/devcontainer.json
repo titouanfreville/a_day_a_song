@@ -1,0 +1,60 @@
+{
+  "name": "A day a song project",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.yml"
+  ],
+  "service": "adas",
+  "workspaceFolder": "/home/app",
+  "shutdownAction": "stopCompose",
+  "extensions": [
+	"visualstudioexptteam.vscodeintellicode",
+	"redhat.vscode-yaml",
+	"esbenp.prettier-vscode",
+	"ryanluker.vscode-coverage-gutters",
+	"oderwat.indent-rainbow",
+	"mikestead.dotenv",
+	"alanwalk.markdown-toc",
+	"darkriszty.markdown-table-prettify",
+	"2gua.rainbow-brackets",
+	"brainfit.vscode-importmagic",
+	"rangav.vscode-thunder-client",
+	"davidanson.vscode-markdownlint",
+	"mtxr.sqltools",
+	"mtxr.sqltools-driver-pg",
+	"4ops.terraform",
+	"run-at-scale.terraform-doc-snippets",
+	"shakram02.bash-beautify",
+	"markis.code-coverage",
+	"ms-azuretools.vscode-docker",
+	"hashicorp.terraform",
+	"VisualStudioExptTeam.vscodeintellicode",
+	"Swellaby.vscode-rust-test-adapter",
+	"rust-lang.rust-analyzer",
+	"1YiB.rust-bundle",
+	"svelte.svelte-vscode",
+	"1YiB.svelte-bundle"
+],
+  "settings": {
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "files.trimTrailingWhitespace": true,
+    "terminal.integrated.profiles.linux": {
+      "zsh": {
+        "path": "/usr/bin/zsh",
+        "args": ["-l"]
+      }
+    },
+    "thunder-client.workspaceRelativePath": ".thunderclient",
+    "thunder-client.showActivityFromCollection": true,
+    "coverage-gutters.coverageReportFileName": "coverage/index.html",
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.showRulerCoverage": true,
+    "files.eol": "\n",
+    "thunder-client.saveToWorkspace": true,
+    "thunder-client.certificates": [
+    ]
+
+  }
+}

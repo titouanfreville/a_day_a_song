@@ -1,0 +1,275 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+      - dev
+jobs:
+  setup:
+    name: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: cancel previous runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - uses: syphar/restore-virtualenv@v1
+        id: branch-venv
+        with:
+          requirement_files: setup.*
+
+      - uses: syphar/restore-pip-download-cache@v1
+        if: steps.branch-venv.outputs.cache-hit != 'true'
+        with:
+          requirement_files: setup.*
+
+      - name: install dependencies
+        if: steps.branch-venv.outputs.cache-hit != 'true'
+        run: |
+          pip install -e ".[ci]"
+          pip uninstall --no-input -y apiritif
+          pip install git+https://github.com/titouanfreville/apiritif
+
+  unit:
+    needs:
+      - setup
+    env:
+      ENV: "test"
+      GOOGLE_APPLICATION_CREDENTIALS: "credentials/test.creds.json"
+      GOOGLE_APPLICATION_CREDENTIALS_ENC: "credentials/test.creds.json.gpg"
+      LOG_NAME: "test"
+      LOG_HANDLER: "gcp"
+      LOG_LEVEL: "ERROR"
+      CHAT_BOT_API_KEY: "testkey"
+      CHATBOT_TOKEN: "testtoken"
+      CHATBOT_ID: "testchat"
+      SENTRY_ENABLED: False
+      SENTRY_TRACE_RATE: 0
+      APP_SANDBOX: True
+      APPLE_VERIFY_PRODUCT_URL: "testurl"
+      ANDROID_SERVICE_ACCOUNT: "smtg"
+      API_KEY: "${{secrets.API_KEY}}"
+      POSTGRES_HOST: "0.0.0.0"
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: boyDev2021*
+      POSTGRES_DB: betonyou
+      POSTGRES_ADAPTER: postgresql
+      POSTGRES_OPTS: sslmode=disable
+      FIRESTORE_EMULATOR_HOST: 0.0.0.0:8081
+      TASK_BROKER: "stub"
+      DD_SERVICE: octo_api
+      DD_ENV: ci
+    name: unit
+    runs-on: ubuntu-latest
+    services:
+      firebase:
+        image: gcr.io/boy-v2-dev/firebase:latest
+        ports:
+          - 8099:8099
+          - 8081:8081
+          - 8086:8086
+          - 9199:9199
+        env:
+          FIRESTORE_PROJECT_ID: boy-v2-dev
+          EMULATOR_TOKEN: 1//03STqdYwIh4TQCgYIARAAGAMSNwF-L9IrMAZIxyLN962bjvJAiyIt_IiuCE5dn77sMds6VHRitD0CDc8K0f1a0UCY-u16U7t92vg
+        credentials:
+          username: _json_key
+          password: ${{ secrets.CI_GCP_SECRET }}
+
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: boyDev2021*
+          POSTGRES_USER: postgres
+          POSTGRES_DB: betonyou
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 10
+    steps:
+      - name: cancel previous runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: restore dependencies
+        uses: syphar/restore-virtualenv@v1
+        id: branch-venv
+        with:
+          requirement_files: setup.*
+
+      - name: retrive secret
+        run: gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.GOOGLE_CREDS_ENCRYPTION_KEY}}" --output "$GOOGLE_APPLICATION_CREDENTIALS" "$GOOGLE_APPLICATION_CREDENTIALS_ENC"
+
+      - name: testing
+        run: |
+          COVERAGE_FILE=.cover_unit coverage run -a -m pytest --ignore=tests/integration --ignore=tests/legacy_integration -xv tests
+          ls -a
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: unit-coverage
+          path: .cover_unit
+          if-no-files-found: error
+
+  integ:
+    needs:
+      - setup
+    env:
+      ENV: "test"
+      GOOGLE_APPLICATION_CREDENTIALS: "credentials/test.creds.json"
+      GOOGLE_APPLICATION_CREDENTIALS_ENC: "credentials/test.creds.json.gpg"
+      LOG_NAME: "test"
+      LOG_HANDLER: "gcp"
+      LOG_LEVEL: "ERROR"
+      CHAT_BOT_API_KEY: "testkey"
+      CHATBOT_TOKEN: "testtoken"
+      CHATBOT_ID: "testchat"
+      SENTRY_ENABLED: False
+      SENTRY_TRACE_RATE: 0
+      APP_SANDBOX: True
+      APPLE_VERIFY_PRODUCT_URL: "testurl"
+      ANDROID_SERVICE_ACCOUNT: "smtg"
+      API_KEY: "${{secrets.API_KEY}}"
+      POSTGRES_HOST: "0.0.0.0"
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: boyDev2021*
+      POSTGRES_DB: betonyou
+      POSTGRES_OPTS: sslmode=disable
+      FIRESTORE_EMULATOR_HOST: 0.0.0.0:8081
+      TASK_BROKER: "stub"
+      DD_SERVICE: octo_api
+      POSTGRES_ADAPTER: postgresql
+      DD_ENV: ci
+    name: integ
+    runs-on: ubuntu-latest
+    services:
+      firebase:
+        image: gcr.io/boy-v2-dev/firebase:latest
+        ports:
+          - 8099:8099
+          - 8081:8081
+          - 8086:8086
+          - 9199:9199
+        env:
+          FIRESTORE_PROJECT_ID: boy-v2-dev
+          EMULATOR_TOKEN: 1//03STqdYwIh4TQCgYIARAAGAMSNwF-L9IrMAZIxyLN962bjvJAiyIt_IiuCE5dn77sMds6VHRitD0CDc8K0f1a0UCY-u16U7t92vg
+        credentials:
+          username: _json_key
+          password: ${{ secrets.CI_GCP_SECRET }}
+
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: boyDev2021*
+          POSTGRES_USER: postgres
+          POSTGRES_DB: betonyou
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 10
+
+    steps:
+      - name: cancel previous runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: restore dependencies
+        uses: syphar/restore-virtualenv@v1
+        id: branch-venv
+        with:
+          requirement_files: setup.*
+
+      - name: retrive secret
+        run: gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.GOOGLE_CREDS_ENCRYPTION_KEY}}" --output "$GOOGLE_APPLICATION_CREDENTIALS" "$GOOGLE_APPLICATION_CREDENTIALS_ENC"
+
+      - name: testing
+        run: |
+          yoyo apply
+          COVERAGE_FILE=.cover_integ coverage run -a -m pytest --ignore=tests/legacy_integration -xv tests/integration
+          ls -a
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: integ-coverage
+          path: .cover_integ
+          if-no-files-found: error
+
+  cover:
+    needs:
+      - integ
+      - unit
+    name: cover
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: cancel previous runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: install coverage
+        run: pip install coverage
+
+      - uses: actions/download-artifact@master
+        with:
+          name: integ-coverage
+
+      - uses: actions/download-artifact@master
+        with:
+          name: unit-coverage
+
+      - name: Combine cover reports
+        run: |
+          coverage combine .cover_unit .cover_integ
+          coverage lcov -o coverage.lcov
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          path-to-lcov: coverage.lcov
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+# TODO add deployment for Terraform someday

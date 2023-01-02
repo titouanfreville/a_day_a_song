@@ -1,0 +1,14 @@
+.*
+*.egg-info
+infra
+credentials
+tests
+venv
+cloudbuild*
+docker-compose*
+*Dockerfile
+Makefile
+*.md
+*.txt
+test.py
+__pycache__

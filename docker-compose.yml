@@ -14,7 +14,7 @@ services:
     networks:
       - adayasong
 
-  adas:   
+  adas:
     build:
       context: ./
       dockerfile: infra/images/local/adas.Dockerfile
@@ -53,4 +53,4 @@ volumes:
   adas-postgres-data: null
 networks:
   adayasong:
-    name: aday_a_song 
+    name: aday_a_song

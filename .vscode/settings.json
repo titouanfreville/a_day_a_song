@@ -1,0 +1,15 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "adasdb",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "local",
+      "group": "A day a Song",
+      "username": "postgres",
+      "password": "adasLocal*",
+      "database": "adas"
+    }
+  ]
+}

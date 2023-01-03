@@ -1,4 +1,6 @@
-struct User {
-    id: String,
+use uuid::Uuid;
+
+pub struct User {
+    id: Uuid,
     pub name: String,
 }

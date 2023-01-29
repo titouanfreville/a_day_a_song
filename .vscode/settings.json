@@ -11,5 +11,9 @@
       "password": "adasLocal*",
       "database": "adas"
     }
-  ]
+  ],
+  "thunder-client.saveToWorkspace": true,
+  "thunder-client.workspaceRelativePath": ".thunderclient",
+  "thunder-client.requestLayout": "Top/Bottom",
+  "thunder-client.responseLimit": 30
 }

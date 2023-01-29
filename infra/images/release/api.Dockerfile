@@ -1,10 +1,10 @@
-FROM python:3.10 AS builder
+FROM python:3.11 AS builder
 
 COPY setup.py .
 
 RUN mkdir /deps && pip install --upgrade pip && pip install  --prefix=/deps  .
 
-FROM python:3.10
+FROM python:3.11
 WORKDIR /aaaa
 
 COPY --from=builder /deps /usr/local

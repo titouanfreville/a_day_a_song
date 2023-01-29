@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "620f42c3-ed26-4add-a949-bc6cff84606f",
+    "colId": "0accab70-f2f5-46ff-8d3b-330d58029e99",
+    "containerId": "",
+    "name": "Ping",
+    "url": "{{HOST}}/ping",
+    "method": "GET",
+    "sortNum": 10000,
+    "created": "2023-01-29T21:30:23.861Z",
+    "modified": "2023-01-29T21:32:10.453Z",
+    "headers": [],
+    "params": [],
+    "tests": []
+  }
+]

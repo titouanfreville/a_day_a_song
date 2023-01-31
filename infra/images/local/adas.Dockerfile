@@ -31,9 +31,15 @@ COPY setup.py .
 RUN python3 -m venv venv \
     && . venv/bin/activate \
     && pip install --upgrade pip \
-    && pip install -e ".[dev]" 
+    && pip install -e ".[dev]"
 
 RUN mkdir /home/vscode/commandhistory && touch /home/vscode/commandhistory/.zsh_history
+
+RUN curl https://sh.rustup.rs -sSf | \
+    sh -s -- --default-toolchain stable -y \
+    && source "$HOME/.cargo/env" \
+    && cargo install diesel_cli
+
 
 WORKDIR /home/app
 

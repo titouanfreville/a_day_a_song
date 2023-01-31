@@ -1,8 +1,8 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="octo-api",
-    version="2.9.1",
+    name="adas-api",
+    version="0.0.1",
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
@@ -19,7 +19,7 @@ setup(
         "sentry-sdk>=1.14,<2",
         "shortuuid>=1.0,<2",
         "sqlalchemy_utils>=0.37,<1",
-        "sqlalchemy[asyncio]>=1.4,<2",
+        "sqlalchemy[asyncio]>=2,<3",
         "uvicorn[standard]>=0.11,<1",
         "pytz",
     ],
